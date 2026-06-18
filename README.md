@@ -6,7 +6,6 @@
 ![AWS](https://img.shields.io/badge/AWS-Serverless-orange)
 ![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-blue)
 ![Textract](https://img.shields.io/badge/Amazon-Textract-yellow)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 ---
 
