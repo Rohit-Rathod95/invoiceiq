@@ -6,7 +6,7 @@ const dynamo = DynamoDBDocumentClient.from(new DynamoDBClient({ region: "us-east
 
 const TABLE_NAME = process.env.TABLE_NAME;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 exports.handler = async (event) => {
   const { invoiceId, extractedData } = event;
@@ -15,8 +15,14 @@ exports.handler = async (event) => {
     const prompt = buildPrompt(extractedData);
 
     // Call Gemini API
-    const geminiResponse = await callGemini(prompt);
-    const rawText = geminiResponse.candidates[0].content.parts[0].text;
+const geminiResponse = await callGemini(prompt);
+console.log("Gemini raw response:", JSON.stringify(geminiResponse));
+
+if (!geminiResponse.candidates || geminiResponse.candidates.length === 0) {
+  throw new Error(`Gemini error: ${JSON.stringify(geminiResponse)}`);
+}
+
+const rawText = geminiResponse.candidates[0].content.parts[0].text;
 
     // Extract JSON from response
     const jsonMatch = rawText.match(/\{[\s\S]*\}/);
@@ -71,7 +77,7 @@ const callGemini = (prompt) => {
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 1500,
+        maxOutputTokens: 8192,
       },
     });
 
@@ -129,3 +135,4 @@ Return ONLY a valid JSON object, no explanation, no markdown, no backticks:
   "emailDraft": "Complete professional email to the finance team flagging the issues found in this invoice. Include specific anomalies and recommended actions."
 }`;
 };
+
